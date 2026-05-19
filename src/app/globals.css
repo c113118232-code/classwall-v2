@@ -1,0 +1,352 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: "Geist", "Geist Fallback", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono", "Geist Mono Fallback", ui-monospace, monospace;
+  --font-display:
+    var(--font-instrument-serif), "Instrument Serif", ui-serif, Georgia, serif;
+  --font-heading: var(--font-display);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-aurora-1: var(--aurora-1);
+  --color-aurora-2: var(--aurora-2);
+  --color-aurora-3: var(--aurora-3);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+/* ============================================
+   亮色（warm ivory）— Claude 招牌奶油米色系
+   學生改色只要改下面這幾個變數
+   ============================================ */
+:root {
+  --background: oklch(0.97 0.012 80);
+  --foreground: oklch(0.24 0.025 45);
+  --card: oklch(0.99 0.008 80);
+  --card-foreground: oklch(0.24 0.025 45);
+  --popover: oklch(0.99 0.008 80);
+  --popover-foreground: oklch(0.24 0.025 45);
+  --primary: oklch(0.62 0.18 38);
+  --primary-foreground: oklch(0.99 0.005 80);
+  --secondary: oklch(0.93 0.018 75);
+  --secondary-foreground: oklch(0.32 0.04 45);
+  --muted: oklch(0.94 0.012 80);
+  --muted-foreground: oklch(0.5 0.025 55);
+  --accent: oklch(0.85 0.08 60);
+  --accent-foreground: oklch(0.24 0.04 45);
+  --destructive: oklch(0.6 0.22 28);
+  --border: oklch(0.88 0.022 70);
+  --input: oklch(0.9 0.018 75);
+  --ring: oklch(0.62 0.18 38);
+  --chart-1: oklch(0.62 0.18 38);
+  --chart-2: oklch(0.7 0.14 60);
+  --chart-3: oklch(0.55 0.12 30);
+  --chart-4: oklch(0.78 0.09 75);
+  --chart-5: oklch(0.42 0.08 40);
+  --radius: 0.875rem;
+  --sidebar: oklch(0.95 0.014 80);
+  --sidebar-foreground: oklch(0.24 0.025 45);
+  --sidebar-primary: oklch(0.62 0.18 38);
+  --sidebar-primary-foreground: oklch(0.99 0.005 80);
+  --sidebar-accent: oklch(0.9 0.024 70);
+  --sidebar-accent-foreground: oklch(0.32 0.04 45);
+  --sidebar-border: oklch(0.88 0.022 70);
+  --sidebar-ring: oklch(0.62 0.18 38);
+
+  /* aurora 三色暖光（背景流動光暈） */
+  --aurora-1: oklch(0.92 0.06 80);
+  --aurora-2: oklch(0.85 0.12 50);
+  --aurora-3: oklch(0.88 0.08 30);
+}
+
+/* ============================================
+   暗色（warm dark）— 深焙咖啡 + 亮暖橘
+   ============================================ */
+.dark {
+  --background: oklch(0.18 0.015 40);
+  --foreground: oklch(0.94 0.015 80);
+  --card: oklch(0.22 0.018 42);
+  --card-foreground: oklch(0.94 0.015 80);
+  --popover: oklch(0.22 0.018 42);
+  --popover-foreground: oklch(0.94 0.015 80);
+  --primary: oklch(0.72 0.16 42);
+  --primary-foreground: oklch(0.18 0.015 40);
+  --secondary: oklch(0.26 0.02 45);
+  --secondary-foreground: oklch(0.94 0.015 80);
+  --muted: oklch(0.24 0.018 42);
+  --muted-foreground: oklch(0.68 0.025 70);
+  --accent: oklch(0.38 0.08 45);
+  --accent-foreground: oklch(0.94 0.015 80);
+  --destructive: oklch(0.68 0.2 28);
+  --border: oklch(0.32 0.02 50);
+  --input: oklch(0.3 0.02 48);
+  --ring: oklch(0.72 0.16 42);
+  --chart-1: oklch(0.72 0.16 42);
+  --chart-2: oklch(0.78 0.14 70);
+  --chart-3: oklch(0.65 0.14 30);
+  --chart-4: oklch(0.55 0.1 50);
+  --chart-5: oklch(0.85 0.1 80);
+  --sidebar: oklch(0.2 0.018 42);
+  --sidebar-foreground: oklch(0.94 0.015 80);
+  --sidebar-primary: oklch(0.72 0.16 42);
+  --sidebar-primary-foreground: oklch(0.18 0.015 40);
+  --sidebar-accent: oklch(0.28 0.025 45);
+  --sidebar-accent-foreground: oklch(0.94 0.015 80);
+  --sidebar-border: oklch(0.32 0.02 50);
+  --sidebar-ring: oklch(0.72 0.16 42);
+
+  --aurora-1: oklch(0.35 0.1 40);
+  --aurora-2: oklch(0.4 0.14 55);
+  --aurora-3: oklch(0.3 0.08 20);
+}
+
+/* ============================================
+   Keyframes — Dazzling 動畫宇宙
+   ============================================ */
+
+/* 背景三色暖光緩慢漂移 */
+@keyframes aurora-drift {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  50% {
+    transform: translate3d(-3%, 4%, 0) rotate(180deg);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) rotate(360deg);
+  }
+}
+
+/* 🔥 熱門卡片漸層流動 */
+@keyframes shimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+/* 即時連線指示燈脈衝 */
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+
+/* 🔥 emoji 微搖晃 */
+@keyframes wiggle {
+  0%,
+  100% {
+    transform: rotate(-6deg);
+  }
+  50% {
+    transform: rotate(8deg);
+  }
+}
+
+/* 按鈕送出成功 ring 擴散 */
+@keyframes flash-ring {
+  0% {
+    opacity: 0.8;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.4);
+  }
+}
+
+/* 主題切換圓形遮罩擴散 */
+@keyframes theme-burst {
+  from {
+    clip-path: circle(0 at var(--theme-x, 50%) var(--theme-y, 0));
+  }
+  to {
+    clip-path: circle(150% at var(--theme-x, 50%) var(--theme-y, 0));
+  }
+}
+
+/* ============================================
+   Base layer
+   ============================================ */
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  html {
+    @apply font-sans;
+    /* 主題切換時的全頁過渡 */
+    transition:
+      background-color 280ms ease,
+      color 280ms ease;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    position: relative;
+    overflow-x: hidden;
+    min-height: 100dvh;
+    font-feature-settings:
+      "ss01" on,
+      "cv11" on;
+  }
+
+  /* 背景 aurora 暖光層 */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: -25%;
+    z-index: -2;
+    pointer-events: none;
+    background:
+      radial-gradient(45% 35% at 18% 22%, var(--aurora-1) 0%, transparent 60%),
+      radial-gradient(38% 32% at 82% 18%, var(--aurora-2) 0%, transparent 65%),
+      radial-gradient(50% 40% at 58% 92%, var(--aurora-3) 0%, transparent 70%);
+    filter: blur(40px);
+    opacity: 0.85;
+    animation: aurora-drift 28s ease-in-out infinite;
+    will-change: transform;
+  }
+
+  /* 紙質感 SVG noise 噪點層 */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml;utf8,<svg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.35 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    opacity: 0.5;
+    mix-blend-mode: overlay;
+  }
+
+  .dark body::after {
+    opacity: 0.35;
+    mix-blend-mode: soft-light;
+  }
+}
+
+/* ============================================
+   Utilities — 提供 page/component 使用
+   ============================================ */
+
+/* 即時連線綠點 + 兩圈擴散 */
+.live-dot {
+  position: relative;
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+  background: oklch(0.7 0.18 145);
+  box-shadow: 0 0 0 2px oklch(0.7 0.18 145 / 0.2);
+}
+.live-dot::before,
+.live-dot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  border: 1.5px solid oklch(0.7 0.18 145 / 0.55);
+  animation: pulse-ring 1.8s cubic-bezier(0.2, 0.7, 0.3, 1) infinite;
+}
+.live-dot::after {
+  animation-delay: 0.9s;
+}
+
+/* 🔥 熱門文字暖光 — 用 text-shadow 模擬 shimmer，避免 background-clip:text 在
+   transform 祖先下崩掉導致整段文字消失。blur 半徑控制在 8px 以下，
+   降低 paint cost（>50 題滾動時不會卡） */
+.hot-shimmer {
+  color: var(--foreground);
+  text-shadow:
+    0 0 1px color-mix(in oklch, var(--primary) 35%, transparent),
+    0 0 8px color-mix(in oklch, var(--primary) 22%, transparent);
+}
+
+/* 滑鼠跟隨光暈（page 用，依 mouse-x / mouse-y CSS var 變動） */
+.mouse-spotlight {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(
+    600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    color-mix(in oklch, var(--primary) 22%, transparent),
+    transparent 60%
+  );
+  transition: opacity 200ms ease;
+  mix-blend-mode: plus-lighter;
+}
+.dark .mouse-spotlight {
+  mix-blend-mode: screen;
+}
+
+/* 表單成功送出 flash ring */
+.flash-ring {
+  position: absolute;
+  inset: -4px;
+  border-radius: inherit;
+  border: 2px solid var(--primary);
+  pointer-events: none;
+  animation: flash-ring 700ms ease-out forwards;
+}
+
+/* ============================================
+   無障礙：尊重 prefers-reduced-motion
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  body::before {
+    animation: none;
+  }
+}
