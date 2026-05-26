@@ -7,11 +7,24 @@ import type { Question } from "@/types/database";
 
 const DEFAULT_PAGE_SIZE = 10;
 
-// 統一排序規則：先按讚數降冪，同讚數時新的在前
-function sortByLikes(list: Question[]): Question[] {
+// 依排序方式排列 questions
+function sortQuestions(
+  list: Question[],
+  sortBy: "likes" | "recent"
+): Question[] {
   return [...list].sort((a, b) => {
-    if (b.likes !== a.likes) return b.likes - a.likes;
-    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    if (sortBy === "likes") {
+      // 先按讚數降冪，同讚數時新的在前
+      if (b.likes !== a.likes) return b.likes - a.likes;
+      return (
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      );
+    } else {
+      // sortBy === "recent"：直接按時間，新的在前
+      return (
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      );
+    }
   });
 }
 
@@ -33,6 +46,7 @@ export function useQuestions(pageSize = DEFAULT_PAGE_SIZE) {
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [sortBy, setSortBy] = useState<"likes" | "recent">("likes");
 
   const offsetRef = useRef(0);
   const idSetRef = useRef<Set<string>>(new Set());
@@ -71,12 +85,12 @@ export function useQuestions(pageSize = DEFAULT_PAGE_SIZE) {
       return true;
     });
 
-    setQuestions((prev) => sortByLikes([...prev, ...batch]));
+    setQuestions((prev) => sortQuestions([...prev, ...batch], sortBy));
     offsetRef.current = from + (data?.length ?? 0);
     setHasMore((data?.length ?? 0) === pageSize);
     setLoading(false);
     setLoadingMore(false);
-  }, [pageSize]);
+  }, [pageSize, sortBy]);
 
   useEffect(() => {
     loadMore();
@@ -90,8 +104,8 @@ export function useQuestions(pageSize = DEFAULT_PAGE_SIZE) {
           const next = payload.new as Question;
           if (idSetRef.current.has(next.id)) return;
           idSetRef.current.add(next.id);
-          // 新題依讚數插入正確位置（新題 likes=0 通常在最後一頁，但仍照規則排）
-          setQuestions((prev) => sortByLikes([next, ...prev]));
+          // 新題依排序方式插入正確位置
+          setQuestions((prev) => sortQuestions([next, ...prev], sortBy));
         }
       )
       .on(
@@ -99,9 +113,12 @@ export function useQuestions(pageSize = DEFAULT_PAGE_SIZE) {
         { event: "UPDATE", schema: "public", table: "questions" },
         (payload) => {
           const next = payload.new as Question;
-          // 按讚變動後重新排序，讓位置即時跟著動
+          // 按讚或不喜歡變動後重新排序，讓位置即時跟著動
           setQuestions((prev) =>
-            sortByLikes(prev.map((q) => (q.id === next.id ? next : q)))
+            sortQuestions(
+              prev.map((q) => (q.id === next.id ? next : q)),
+              sortBy
+            )
           );
         }
       )
@@ -123,5 +140,14 @@ export function useQuestions(pageSize = DEFAULT_PAGE_SIZE) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return { questions, loading, loadingMore, hasMore, error, loadMore };
+  return {
+    questions,
+    loading,
+    loadingMore,
+    hasMore,
+    error,
+    loadMore,
+    sortBy,
+    setSortBy,
+  };
 }

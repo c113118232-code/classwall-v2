@@ -3,6 +3,7 @@
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useMemo, useRef } from "react";
 
+import { Button } from "@/components/ui/button";
 import { QuestionCard } from "@/components/question-card";
 import { QuestionForm } from "@/components/question-form";
 import { StatsPill } from "@/components/stats-pill";
@@ -13,8 +14,16 @@ import { cn } from "@/lib/utils";
 const PAGE_SIZE = 10;
 
 export default function Home() {
-  const { questions, loading, loadingMore, hasMore, error, loadMore } =
-    useQuestions(PAGE_SIZE);
+  const {
+    questions,
+    loading,
+    loadingMore,
+    hasMore,
+    error,
+    loadMore,
+    sortBy,
+    setSortBy,
+  } = useQuestions(PAGE_SIZE);
   const spotlightRef = useRef<HTMLDivElement>(null);
 
   // 滑鼠跟隨光暈：直接寫 CSS var，零 React 介入
@@ -125,9 +134,29 @@ export default function Home() {
             <h2 className="font-display text-2xl tracking-tight sm:text-3xl">
               牆上的問題
             </h2>
-            <span className="text-[11px] uppercase tracking-wider text-muted-foreground">
-              依讚數排序 · 每頁 {PAGE_SIZE} 題
-            </span>
+            <div className="flex items-center gap-2">
+              <Button
+                type="button"
+                onClick={() => setSortBy("likes")}
+                variant={sortBy === "likes" ? "default" : "ghost"}
+                size="sm"
+                className="text-xs"
+              >
+                依讚數
+              </Button>
+              <Button
+                type="button"
+                onClick={() => setSortBy("recent")}
+                variant={sortBy === "recent" ? "default" : "ghost"}
+                size="sm"
+                className="text-xs"
+              >
+                依時間
+              </Button>
+              <span className="ml-1 text-[11px] uppercase tracking-wider text-muted-foreground">
+                · 每頁 {PAGE_SIZE} 題
+              </span>
+            </div>
           </motion.div>
 
           {loading ? (
