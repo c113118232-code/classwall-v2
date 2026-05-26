@@ -51,6 +51,7 @@ export function useQuestions(pageSize = DEFAULT_PAGE_SIZE) {
   const offsetRef = useRef(0);
   const idSetRef = useRef<Set<string>>(new Set());
   const inFlightRef = useRef(false);
+  const sortByRef = useRef<"likes" | "recent">("likes");
 
   const loadMore = useCallback(async () => {
     if (inFlightRef.current) return;
@@ -63,12 +64,19 @@ export function useQuestions(pageSize = DEFAULT_PAGE_SIZE) {
     const from = offsetRef.current;
     const to = from + pageSize - 1;
 
-    const { data, error: fetchError } = await supabase
-      .from("questions")
-      .select("*")
-      .order("likes", { ascending: false })
-      .order("created_at", { ascending: false })
-      .range(from, to);
+    // 根據 sortBy 決定 DB 查詢的排序
+    let query = supabase.from("questions").select("*");
+
+    if (sortBy === "likes") {
+      query = query
+        .order("likes", { ascending: false })
+        .order("created_at", { ascending: false });
+    } else {
+      // sortBy === "recent"
+      query = query.order("created_at", { ascending: false });
+    }
+
+    const { data, error: fetchError } = await query.range(from, to);
 
     inFlightRef.current = false;
 
@@ -85,16 +93,33 @@ export function useQuestions(pageSize = DEFAULT_PAGE_SIZE) {
       return true;
     });
 
-    setQuestions((prev) => sortQuestions([...prev, ...batch], sortBy));
+    // 第一頁時 replace，後續頁面時 append
+    if (from === 0) {
+      setQuestions(sortQuestions(batch, sortBy));
+    } else {
+      setQuestions((prev) => sortQuestions([...prev, ...batch], sortBy));
+    }
     offsetRef.current = from + (data?.length ?? 0);
     setHasMore((data?.length ?? 0) === pageSize);
     setLoading(false);
     setLoadingMore(false);
   }, [pageSize, sortBy]);
 
+  // 當 sortBy 改變時，重置分頁狀態，不直接改 questions state
+  // 而是讓 loadMore 重新查詢並重新渲染
+  useEffect(() => {
+    offsetRef.current = 0;
+    idSetRef.current.clear();
+    sortByRef.current = sortBy;
+  }, [sortBy]);
+
+  // Mount 或 sortBy 改變時載入第一頁
   useEffect(() => {
     loadMore();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sortBy]);
 
+  useEffect(() => {
     const channel = supabase
       .channel("questions-realtime")
       .on(
@@ -105,7 +130,9 @@ export function useQuestions(pageSize = DEFAULT_PAGE_SIZE) {
           if (idSetRef.current.has(next.id)) return;
           idSetRef.current.add(next.id);
           // 新題依排序方式插入正確位置
-          setQuestions((prev) => sortQuestions([next, ...prev], sortBy));
+          setQuestions((prev) =>
+            sortQuestions([next, ...prev], sortByRef.current)
+          );
         }
       )
       .on(
@@ -117,7 +144,7 @@ export function useQuestions(pageSize = DEFAULT_PAGE_SIZE) {
           setQuestions((prev) =>
             sortQuestions(
               prev.map((q) => (q.id === next.id ? next : q)),
-              sortBy
+              sortByRef.current
             )
           );
         }
@@ -136,9 +163,7 @@ export function useQuestions(pageSize = DEFAULT_PAGE_SIZE) {
     return () => {
       supabase.removeChannel(channel);
     };
-    // 只在 mount 時跑一次；loadMore 因為 useCallback 穩定
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [loadMore]);
 
   return {
     questions,
