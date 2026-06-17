@@ -2,6 +2,7 @@ export type Question = {
   id: string;
   content: string;
   likes: number;
+  dislikes: number;
   created_at: string;
 };
 

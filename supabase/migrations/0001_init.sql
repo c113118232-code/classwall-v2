@@ -7,6 +7,7 @@ create table if not exists public.questions (
   id uuid primary key default gen_random_uuid(),
   content text not null check (char_length(content) between 1 and 500),
   likes integer not null default 0 check (likes >= 0),
+  dislikes integer not null default 0 check (dislikes >= 0),
   created_at timestamptz not null default now()
 );
 
@@ -35,6 +36,16 @@ create table if not exists public.question_likes (
 create index if not exists question_likes_question_id_idx
   on public.question_likes (question_id);
 
+create table if not exists public.question_dislikes (
+  question_id uuid not null references public.questions (id) on delete cascade,
+  anon_id text not null,
+  created_at timestamptz not null default now(),
+  primary key (question_id, anon_id)
+);
+
+create index if not exists question_dislikes_question_id_idx
+  on public.question_dislikes (question_id);
+
 -- 4. 開啟 Realtime（idempotent：判斷表是否已在 publication 內再加）
 do $$
 begin
@@ -60,7 +71,8 @@ end $$;
 alter table public.questions enable row level security;
 alter table public.answers enable row level security;
 alter table public.question_likes enable row level security;
--- ⚠️ question_likes 故意「不給任何 policy」→ anon 完全摸不到，
+alter table public.question_dislikes enable row level security;
+-- ⚠️ question_likes / question_dislikes 故意「不給任何 policy」→ anon 完全摸不到，
 --    只有下方 SECURITY DEFINER 函式以 owner (postgres) 身份能寫入
 
 drop policy if exists "anyone can read questions" on public.questions;
@@ -125,6 +137,44 @@ grant execute on function public.increment_question_like(uuid, text) to anon, au
 
 comment on function public.increment_question_like(uuid, text) is
   'Atomically insert dedup row + increment questions.likes. Anon-callable via supabase.rpc().';
+
+-- 6b. RPC：原子地寫 dislike 去重 row + bump dislikes
+create or replace function public.increment_question_dislike(
+  qid uuid,
+  anon text
+)
+returns integer
+language plpgsql
+security definer
+set search_path = public, pg_temp
+as $$
+declare
+  new_dislikes integer;
+begin
+  insert into public.question_dislikes (question_id, anon_id)
+  values (qid, anon)
+  on conflict do nothing;
+
+  if found then
+    update public.questions
+       set dislikes = dislikes + 1
+     where id = qid
+    returning dislikes into new_dislikes;
+  else
+    select dislikes into new_dislikes
+      from public.questions
+     where id = qid;
+  end if;
+
+  return new_dislikes;
+end;
+$$;
+
+revoke all on function public.increment_question_dislike(uuid, text) from public;
+grant execute on function public.increment_question_dislike(uuid, text) to anon, authenticated;
+
+comment on function public.increment_question_dislike(uuid, text) is
+  'Atomically insert dedup row + increment questions.dislikes. Anon-callable via supabase.rpc().';
 
 -- 7. seed：一筆示範資料
 insert into public.questions (content, likes)
